@@ -3,41 +3,76 @@ return {
   -- Add flutter-tools plugin
   {
     "nvim-flutter/flutter-tools.nvim",
-    lazy = true,
+    lazy = false, -- Must load at startup to register DAP adapter
     dependencies = {
       "nvim-lua/plenary.nvim",
       "stevearc/dressing.nvim", -- optional dependency
+      "mfussenegger/nvim-dap", -- DAP integration
     },
-    ft = "dart", -- only load on dart files
     config = function()
       require("flutter-tools").setup({
         ui = {
           -- the border type to use for floating windows
-          -- possible values: single, double, rounded, solid, shadow, none
           border = "rounded",
         },
         decorations = {
           statusline = {
-            -- set to true to be able to see when dart file are loading
             app_version = false,
           },
         },
         debugger = { -- integrate with nvim-dap
-          enabled = false,
-          run_via_dap = false, -- use dap instead of flutter run
+          enabled = true,
+          run_via_dap = true, -- use dap for debugging
+          exception_breakpoints = {},
+          register_configurations = function(paths)
+            local dap = require("dap")
+            -- Configure the dart adapter
+            dap.adapters.dart = {
+              type = "executable",
+              command = paths.flutter_bin,
+              args = { "debug_adapter" },
+            }
+            dap.configurations.dart = {
+              {
+                type = "dart",
+                request = "launch",
+                name = "Launch Flutter Program",
+                dartSdkPath = paths.dart_sdk,
+                flutterSdkPath = paths.flutter_sdk,
+                program = "${workspaceFolder}/lib/main.dart",
+                cwd = "${workspaceFolder}",
+              },
+              {
+                type = "dart",
+                request = "attach",
+                name = "Attach to Flutter Process",
+              },
+            }
+          end,
         },
-        fvm = false, -- use fvm if configured
-        flutter_path = nil, -- optionally set the flutter path
-        flutter_lookup_cmd = nil, -- example "dirname $(which flutter)" or "asdf where flutter"
+        fvm = false,
+        flutter_path = "/Users/jeanpauljacquot/.puro/envs/default/flutter/bin/flutter",
         widget_guides = {
           enabled = true,
         },
         dev_log = {
           enabled = true,
-          open_cmd = "tabedit", -- command to use to open the log buffer
+          open_cmd = "tabedit",
         },
         outline = {
-          open_cmd = "30vnew", -- command to use to open the outline buffer
+          open_cmd = "30vnew",
+        },
+        lsp = {
+          color = {
+            enabled = true,
+          },
+          on_attach = function(_, bufnr)
+            vim.keymap.set("n", "<leader>Fo", "<cmd>FlutterOutlineToggle<CR>", { buffer = bufnr, desc = "Flutter Outline" })
+            vim.keymap.set("n", "<leader>Fr", "<cmd>FlutterRun<CR>", { buffer = bufnr, desc = "Flutter Run" })
+            vim.keymap.set("n", "<leader>Fq", "<cmd>FlutterQuit<CR>", { buffer = bufnr, desc = "Flutter Quit" })
+            vim.keymap.set("n", "<leader>FR", "<cmd>FlutterRestart<CR>", { buffer = bufnr, desc = "Flutter Restart" })
+            vim.keymap.set("n", "<leader>FD", "<cmd>FlutterDevices<CR>", { buffer = bufnr, desc = "Flutter Devices" })
+          end,
         },
       })
     end,

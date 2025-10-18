@@ -20,6 +20,21 @@ vim.keymap.set("n", "<leader>cA", function()
   })
 end, { desc = "Auto-fix all ESLint issues" })
 
+-- Code action bindings for macOS users
+vim.keymap.set("n", "<D-.>", function()
+  vim.lsp.buf.code_action()
+end, { desc = "Code actions (cmd+.)" })
+
+-- Code action bindings for macOS users
+vim.keymap.set("n", "<D-;>", function()
+  vim.lsp.buf.code_action()
+end, { desc = "Code actions (cmd+;)" })
+
+-- Ctrl+; for code actions
+vim.keymap.set("n", "<C-;>", function()
+  vim.lsp.buf.code_action()
+end, { desc = "Code actions (ctrl+;)" })
+
 vim.keymap.set("n", "[d", function()
   vim.diagnostic.goto_prev()
 end, { desc = "Previous diagnostic" })
