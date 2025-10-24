@@ -43,6 +43,7 @@ return {
         "typescript-language-server",
         "json-lsp",
         "yaml-language-server",
+        "rust-analyzer",
       },
     },
   },

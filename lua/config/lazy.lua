@@ -18,6 +18,8 @@ require("lazy").setup({
   spec = {
     -- add LazyVim and import its plugins
     { "LazyVim/LazyVim", import = "lazyvim.plugins" },
+    -- add LazyVim Rust extra
+    { import = "lazyvim.plugins.extras.lang.rust" },
     -- Load flutter-tools first to register DAP adapter
     { import = "plugins.flutter" },
     -- import/override with your plugins

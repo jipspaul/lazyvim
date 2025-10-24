@@ -64,14 +64,25 @@ return {
         },
         lsp = {
           color = {
-            enabled = true,
+            enabled = false, -- Disable to avoid textDocument/documentColor errors
           },
+          capabilities = function()
+            local capabilities = vim.lsp.protocol.make_client_capabilities()
+            capabilities.textDocument = capabilities.textDocument or {}
+            capabilities.textDocument.declaration = {
+              dynamicRegistration = false,
+              linkSupport = true,
+            }
+            return capabilities
+          end,
           on_attach = function(_, bufnr)
             vim.keymap.set("n", "<leader>Fo", "<cmd>FlutterOutlineToggle<CR>", { buffer = bufnr, desc = "Flutter Outline" })
             vim.keymap.set("n", "<leader>Fr", "<cmd>FlutterRun<CR>", { buffer = bufnr, desc = "Flutter Run" })
             vim.keymap.set("n", "<leader>Fq", "<cmd>FlutterQuit<CR>", { buffer = bufnr, desc = "Flutter Quit" })
             vim.keymap.set("n", "<leader>FR", "<cmd>FlutterRestart<CR>", { buffer = bufnr, desc = "Flutter Restart" })
             vim.keymap.set("n", "<leader>FD", "<cmd>FlutterDevices<CR>", { buffer = bufnr, desc = "Flutter Devices" })
+            -- Add keymap for declaration navigation
+            vim.keymap.set("n", "gD", vim.lsp.buf.declaration, { buffer = bufnr, desc = "Go to Declaration" })
           end,
         },
       })
